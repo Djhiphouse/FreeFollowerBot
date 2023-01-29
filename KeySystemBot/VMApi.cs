@@ -98,6 +98,45 @@ namespace KeySystemBot
 			Console.WriteLine(response.Content);
 			return response.Content;
 		}
+
+		public class Cores
+		{
+			public int amount { get; set; }
+			public double price { get; set; }
+		}
+
+		public class Data
+		{
+			public Cores cores { get; set; }
+			public Mem mem { get; set; }
+			public Storage storage { get; set; }
+			public Ipv4 ipv4 { get; set; }
+		}
+
+		public class Ipv4
+		{
+			public int amount { get; set; }
+			public double price { get; set; }
+		}
+
+		public class Mem
+		{
+			public int amount { get; set; }
+			public double price { get; set; }
+		}
+
+		public class Roott
+		{
+			public string status { get; set; }
+			public Data data { get; set; }
+		}
+
+		public class Storage
+		{
+			public int amount { get; set; }
+			public double price { get; set; }
+		}
+
 		public bool ConfigureServer(int Cores, int Ram, int Disk)
 		{
 
@@ -169,7 +208,7 @@ namespace KeySystemBot
 				return false;
 		}
 
-		public bool ReinstallServer(String VMID, Enum Server)
+		public bool ReinstallServer(String VMID, String Server)
 		{
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/reinstall");

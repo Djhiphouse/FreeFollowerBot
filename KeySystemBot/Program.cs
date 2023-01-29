@@ -20,15 +20,22 @@ namespace KeySystemBot
 
 		
 		private DiscordSocketClient _client;
-
+		public static readonly String[] Server = {
+				"Windows_2019_eval",
+				"CentOS_7",
+				"Ubuntu 22.10",
+				"valid_os",
+				"Debian 11.0"
+		};
 		static void Main(string[] args)
         {
-			Console.WriteLine(API.List());
+			//Console.WriteLine("Reinstall: " + API.ReinstallServer("20037", Server[2]));
 			new Program().MainAsync().GetAwaiter().GetResult();
 		}
 
 		public async Task MainAsync()
 		{
+
 			var token = "MTA2OTA3NTQwODI2OTYxMTEyOQ.GcQ9i9.b4ImlKBRazCFnj5jfNtM3lTS0LKmD7i21FDhZw";
 			_client = new DiscordSocketClient();
 			_client.MessageReceived += CommandHandler;
@@ -53,13 +60,7 @@ namespace KeySystemBot
 			Console.WriteLine(((LogMessage)(msg)).ToString((StringBuilder)null, true, true, DateTimeKind.Local, (int?)11));
 			return Task.CompletedTask;
 		}
-		public readonly String[] Server = {
-				"Windows_2019_eval",
-				"CentOS_7",
-				"Ubuntu 22.10",
-				"valid_os",
-				"Debian 11.0"
-		};
+		
 		private async Task<Task> CommandHandler(SocketMessage message)
 		{
 			//1 2 3
@@ -87,7 +88,7 @@ namespace KeySystemBot
 					val.AddField("Debian Server:", "5");
 					val.WithDescription("***Use !Create [Cores] [Ram] [Disk] [Server]***");
 					val.WithColor(Color.Blue);
-					await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+					await message.Channel.SendMessageAsync("", false, val.Build());
 				}
 				String[] Args = message.Content.Split(' ');
 				Console.WriteLine(String.Join(",", Args));
@@ -102,6 +103,7 @@ namespace KeySystemBot
 						val.AddField("Cores:", Args[1]);
 						val.AddField("Ram: ", Args[2]);
 						val.AddField("Disk: ", Args[3]);
+						val.AddField("Created By: ", message.Author);
 						val.WithColor(Color.Green);
 						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
 					}
@@ -114,6 +116,7 @@ namespace KeySystemBot
 						val.AddField("Cores:", Args[1]);
 						val.AddField("Ram: ", Args[2]);
 						val.AddField("Disk: ", Args[3]);
+						val.AddField("Created By: ", message.Author);
 						val.WithColor(Color.Red);
 						await message.Channel.SendMessageAsync("", false, val.Build());
 					}
@@ -127,6 +130,7 @@ namespace KeySystemBot
 					val.AddField("Cores:", Args[1]);
 					val.AddField("Ram: ", Args[2]);
 					val.AddField("Disk: ", Args[3]);
+					val.AddField("Created By: ", message.Author);
 					val.WithColor(Color.Red);
 					await message.Channel.SendMessageAsync("", false, val.Build());
 				}
@@ -134,7 +138,7 @@ namespace KeySystemBot
 
 				return Task.CompletedTask;
 			}
-			else if (message.Content.StartsWith("!delVM"))
+			else if (message.Content.StartsWith("!deleteserver"))
 			{
 				String[] Args = message.Content.Split(' ');
 				try
@@ -144,6 +148,7 @@ namespace KeySystemBot
 						EmbedBuilder val = new EmbedBuilder();
 						val.WithTitle("Server Sucesfully Deleted!");
 						val.AddField("Vm ID:", Server[Int32.Parse(Args[1])]);
+						val.AddField("Deleted By: ", message.Author);
 						val.WithColor(Color.Green);
 						await message.Channel.SendMessageAsync("", false, val.Build());
 					}
@@ -152,6 +157,7 @@ namespace KeySystemBot
 						EmbedBuilder val = new EmbedBuilder();
 						val.WithTitle("Server Failed to Delete Server!");
 						val.AddField("Vm ID:", Server[Int32.Parse(Args[1])]);
+						val.AddField("Deleted By: ", message.Author);
 						val.WithColor(Color.Red);
 						await message.Channel.SendMessageAsync("", false, val.Build());
 					}
@@ -226,17 +232,175 @@ namespace KeySystemBot
 					val.WithColor(Color.Red);
 					await message.Channel.SendMessageAsync("", false, val.Build());
 				}
-			}
-			
-
-
-			if (message.Content == "fevregv")
+			}else if (message.Content.StartsWith("!getprice"))
 			{
-				EmbedBuilder val7 = new EmbedBuilder();
-				val7.WithTitle("Help");
-				val7.WithDescription("- ");
-				val7.WithColor(Color.Teal);
-				await message.Channel.SendMessageAsync("", false, val7.Build(), (RequestOptions)null, (AllowedMentions)null, (MessageReference)null, (MessageComponent)null, (ISticker[])null, (Embed[])null, (MessageFlags)0);
+				Roott myDeserializedClass = JsonConvert.DeserializeObject<Roott>(API.GetPrices());
+
+				try
+				{
+					EmbedBuilder val = new EmbedBuilder();
+					val.WithTitle("**Prices**");
+					val.AddField("1x Cores:", myDeserializedClass.data.cores.price + " €");
+					val.AddField("1GB Ram:",myDeserializedClass.data.mem.price + " €");
+					val.AddField("10GBs Storage:", myDeserializedClass.data.storage.price + " €");
+					val.AddField("1x IP:",myDeserializedClass.data.ipv4.price + " €");
+					val.WithColor(Color.Green);
+					await message.Channel.SendMessageAsync("", false, val.Build());
+				}
+
+				catch (Exception e)
+				{
+					EmbedBuilder val = new EmbedBuilder();
+					val.WithTitle("**Prices Failed**");
+					val.AddField("1x Cores:", "NULL" + " €");
+					val.AddField("1GB Ram:", "NULL" + " €");
+					val.AddField("10GBs Storage:", "NULL" + " €");
+					val.AddField("1x IP:", "NULL" + " €");
+					val.WithColor(Color.Red);
+					await message.Channel.SendMessageAsync("", false, val.Build());
+				}
+
+			}
+			if (message.Content.StartsWith("!setrdns"))
+			{
+				if (message.Content.Contains("help"))
+				{
+					EmbedBuilder val7 = new EmbedBuilder();
+					val7.WithTitle("Rdns Help");
+					val7.WithDescription("**Use !setrdns [Domain]");
+
+					val7.WithColor(Color.Teal);
+					await message.Channel.SendMessageAsync("", false, val7.Build());
+				}
+				String[] Args = message.Content.Split(' ');
+				try
+				{
+
+					if (API.Setrdns(Args[1], Args[2]))
+					{
+						EmbedBuilder val7 = new EmbedBuilder();
+						val7.WithTitle("Server Rdns");
+						val7.AddField("VmID: ", Args[1]);
+						val7.AddField("Domain: ", Server[Int32.Parse(Args[2])]);
+						val7.AddField("Setiing rdns By: ", message.Author);
+						val7.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("", false, val7.Build());
+					}
+					else
+					{
+						EmbedBuilder val7 = new EmbedBuilder();
+						val7.WithTitle("Server Rdns Failed");
+						val7.AddField("VmID: ", Args[1]);
+						val7.AddField("Domain: ", Server[Int32.Parse(Args[2])]);
+						val7.AddField("Setiing rdns By: ", message.Author);
+						val7.WithColor(Color.Red);
+						await message.Channel.SendMessageAsync("", false, val7.Build(), (RequestOptions)null, (AllowedMentions)null, (MessageReference)null, (MessageComponent)null, (ISticker[])null, (Embed[])null, (MessageFlags)0);
+					}
+				}
+				catch (Exception e)
+				{
+					EmbedBuilder val7 = new EmbedBuilder();
+					val7.WithTitle("Server Rdns Failed");
+					val7.AddField("VmID: ", Args[1]);
+					val7.AddField("Domain: ", Server[Int32.Parse(Args[2])]);
+					val7.AddField("Setiing rdns By: ", message.Author);
+					val7.WithColor(Color.Red);
+					await message.Channel.SendMessageAsync("", false, val7.Build(), (RequestOptions)null, (AllowedMentions)null, (MessageReference)null, (MessageComponent)null, (ISticker[])null, (Embed[])null, (MessageFlags)0);
+				}
+				return Task.CompletedTask;
+
+			}
+
+			if (message.Content.StartsWith("!setstatus"))
+			{
+				if (message.Content.Contains("help"))
+				{
+					EmbedBuilder val7 = new EmbedBuilder();
+					val7.WithTitle("Status Help");
+					val7.WithDescription("**Use !setstatus [Status]");
+					val7.AddField("Start: ", "1");
+					val7.WithColor(Color.Teal);
+					await message.Channel.SendMessageAsync("", false, val7.Build());
+				}
+				String[] Args = message.Content.Split(' ');
+				try
+				{
+
+					if (API.Setrdns(Args[1], Args[2]))
+					{
+						EmbedBuilder val7 = new EmbedBuilder();
+						val7.WithTitle("Server Rdns");
+						val7.AddField("VmID: ", Args[1]);
+						val7.AddField("Domain: ", Server[Int32.Parse(Args[2])]);
+						val7.AddField("Setiing rdns By: ", message.Author);
+						val7.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("", false, val7.Build());
+					}
+					else
+					{
+						EmbedBuilder val7 = new EmbedBuilder();
+						val7.WithTitle("Server Rdns Failed");
+						val7.AddField("VmID: ", Args[1]);
+						val7.AddField("Domain: ", Server[Int32.Parse(Args[2])]);
+						val7.AddField("Setiing rdns By: ", message.Author);
+						val7.WithColor(Color.Red);
+						await message.Channel.SendMessageAsync("", false, val7.Build(), (RequestOptions)null, (AllowedMentions)null, (MessageReference)null, (MessageComponent)null, (ISticker[])null, (Embed[])null, (MessageFlags)0);
+					}
+				}
+				catch (Exception e)
+				{
+					EmbedBuilder val7 = new EmbedBuilder();
+					val7.WithTitle("Server Rdns Failed");
+					val7.AddField("VmID: ", Args[1]);
+					val7.AddField("Domain: ", Server[Int32.Parse(Args[2])]);
+					val7.AddField("Setiing rdns By: ", message.Author);
+					val7.WithColor(Color.Red);
+					await message.Channel.SendMessageAsync("", false, val7.Build(), (RequestOptions)null, (AllowedMentions)null, (MessageReference)null, (MessageComponent)null, (ISticker[])null, (Embed[])null, (MessageFlags)0);
+				}
+				return Task.CompletedTask;
+
+			}
+
+
+			if (message.Content.StartsWith("!reinstall"))
+			{
+				String[] Args = message.Content.Split(' ');
+				try
+				{
+					
+					if (API.ReinstallServer(Args[1], Server[Int32.Parse(Args[2])]))
+					{
+						EmbedBuilder val7 = new EmbedBuilder();
+						val7.WithTitle("Server Reinstaller");
+						val7.AddField("VmID: ", Args[1]);
+						val7.AddField("Server: ", Server[Int32.Parse(Args[2])]);
+						val7.AddField("Reinstalled By: ", message.Author);
+						val7.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("", false, val7.Build());
+					}
+					else
+					{
+						EmbedBuilder val7 = new EmbedBuilder();
+						val7.WithTitle("Server Reinstaller Failed");
+						val7.AddField("VmID: ", Args[1]);
+						val7.AddField("Server: ", Server[Int32.Parse(Args[2])]);
+						val7.AddField("Reinstalled By: ", message.Author);
+						val7.WithColor(Color.Red);
+						await message.Channel.SendMessageAsync("", false, val7.Build(), (RequestOptions)null, (AllowedMentions)null, (MessageReference)null, (MessageComponent)null, (ISticker[])null, (Embed[])null, (MessageFlags)0);
+					}
+				}
+				catch(Exception e)
+				{
+					EmbedBuilder val7 = new EmbedBuilder();
+					val7.WithTitle("Server Reinstaller Failed");
+					val7.AddField("VmID: ", Args[1]);
+					val7.AddField("Server: ", Server[Int32.Parse(Args[2])]);
+					val7.AddField("Reinstalled By: ", message.Author);
+					val7.WithColor(Color.Red);
+					await message.Channel.SendMessageAsync("", false, val7.Build(), (RequestOptions)null, (AllowedMentions)null, (MessageReference)null, (MessageComponent)null, (ISticker[])null, (Embed[])null, (MessageFlags)0);
+				}
+				
+				
 			}
 			return Task.CompletedTask;
 		}
