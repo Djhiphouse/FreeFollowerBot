@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 using Discord.Net.Rest;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -32,42 +33,61 @@ namespace KeySystemBot
 		RestClient client;
 		public String List()
 		{
+			List<String> Hostnames = new List<String>();
+			List<String> RootPass = new List<String>();
+			List<String> Ipv4 = new List<String>();
+			List<String> OS = new List<String>();
+			List<String> Mem = new List<String>();
+			List<String> Cores = new List<String>();
+			List<String> VmId = new List<String>();
+			List<String> Disk = new List<String>();
+			List<String> Date = new List<String>();
+
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/list");
 			var request = new RestRequest(Method.GET);
 			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
 			IRestResponse response = client.Execute(request);
-			Console.WriteLine(response.Content);
 
-			var json = response.Content;
-
-			var objects = JArray.Parse(json); // parse as array  
-			foreach (JObject root in objects)
-			{
-				foreach (KeyValuePair<String, JToken> app in root)
-				{
-					
-					var description = (String)app.Value["hostname"];
-					var value = (String)app.Value["vmID"];
-
-					
-					Console.WriteLine(description);
-					Console.WriteLine(value);
-					Console.WriteLine("\n");
-				}
-			}
-			return ""; 
+			//Console.WriteLine("Hostnames: " + String.Join(",", Hostnames));
+			//Console.WriteLine("VmID: " + String.Join(",", VmId));
+			//Console.WriteLine("Rootpass: " + String.Join(",", RootPass));
+			//Console.WriteLine("IP: " + String.Join(",", Ipv4));
+			//Console.WriteLine("Os: " + String.Join(",", OS));
+			//Console.WriteLine("Mem: " + String.Join(",", Mem));
+			//Console.WriteLine("Cores: " + String.Join(",", Cores));
+			//Console.WriteLine("Disk: " + String.Join(",", Disk));
+			//Console.WriteLine("CreatedDate: " + String.Join(",", Date));
+			//Console.WriteLine("HostNames: "+ String.Join(",", Hostnames));
+			return response.Content; 
 		}
 		public class ServerConfig
 		{
-			public int cores;
-			public int mem;
-			public int disk;
-			public string rdns;
-			public string os;
-			public string ipv4;
-			public string root_login;
-			public string hostname;
+			public int cores { get; set; }
+			public int mem { get; set; }
+			public int disk { get; set; }
+			public string rdns { get; set; }
+			public string os { get; set; }
+			public string ipv4 { get; set; }
+			public string root_login { get; set; }
+			public string hostname { get; set; }
 		}
+
+		public class Datum
+		{
+			public int vmID { get; set; }
+			public object externalID { get; set; }
+			public DateTime createDate { get; set; }
+			public ServerConfig config { get; set; }
+			
+		}
+
+		public class Root
+		{
+			public string status { get; set; }
+			public List<Datum> data { get; set; }
+	
+		}
+
 
 		public String GetPrices()
 		{

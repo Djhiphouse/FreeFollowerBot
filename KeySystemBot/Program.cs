@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using Newtonsoft.Json;
+using static KeySystemBot.VMApi;
 
 namespace KeySystemBot
 {
@@ -166,36 +168,66 @@ namespace KeySystemBot
 			}
 			else if (message.Content.StartsWith("!Server-List"))
 			{
-				
+				List<String> Hostnames = new List<String>();
+				List<String> RootPass = new List<String>();
+				List<String> Ipv4 = new List<String>();
+				List<String> OS = new List<String>();
+				List<String> Mem = new List<String>();
+				List<String> Cores = new List<String>();
+				List<String> VmId = new List<String>();
+				List<String> Disk = new List<String>();
+				List<String> Date = new List<String>();
+				Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(API.List());
+				//Console.WriteLine(myDeserializedClass.data.Count);
+
+				foreach (var item in myDeserializedClass.data)
+				{
+					Hostnames.Add(item.config.hostname);
+					RootPass.Add(item.config.root_login);
+					Ipv4.Add(item.config.ipv4);
+					OS.Add(item.config.os);
+					Mem.Add(item.config.mem.ToString());
+					Cores.Add(item.config.cores.ToString());
+					VmId.Add(item.vmID.ToString());
+					Disk.Add(item.config.disk.ToString());
+					Date.Add(item.createDate.ToString());
+				}
 				try
 				{
-					EmbedBuilder val = new EmbedBuilder();
-					val.WithTitle("Server Sucesfully Getting Server!");
-					val.AddField("Vm ID:",API.List());
-					val.WithColor(Color.Green);
-					await message.Channel.SendMessageAsync("", false, val.Build());
+					for(int i = 0; i< Hostnames.Count; i++)
+					{
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server Sucesfully Getting Server!");
+						val.AddField("Hostname:", Hostnames[i]);
+						val.AddField("IpV4:", Ipv4[i]);
+						val.AddField("OS:", OS[i]);
+						val.AddField("Ram:", Mem[i]);
+						val.AddField("Cores:", Cores[i]);
+						val.AddField("VmID:", VmId[i]);
+						val.AddField("Disk:", Disk[i]);
+						val.AddField("Created:", Date[i]);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("", false, val.Build());
+					}
+					
 				}
 				catch (Exception e)
 				{
 					EmbedBuilder val = new EmbedBuilder();
 					val.WithTitle("Server Failed to Getting Server List!");
-					val.AddField("Vm ID:", "Null");
+					val.AddField("Hostname:", "NULL");
+					val.AddField("IpV4:", "NULL");
+					val.AddField("OS:", "NULL");
+					val.AddField("Ram:", "NULL");
+					val.AddField("Cores:", "NULL");
+					val.AddField("VmID:", "NULL");
+					val.AddField("Disk:", "NULL");
+					val.AddField("Created:", "NULL");
 					val.WithColor(Color.Red);
 					await message.Channel.SendMessageAsync("", false, val.Build());
 				}
 			}
-			else if (message.Content.StartsWith("!delVM"))
-			{
-				String[] Args = message.Content.Split(' ');
-				try
-				{
-
-				}
-				catch (Exception e)
-				{
-
-				}
-			}
+			
 
 
 			if (message.Content == "fevregv")
