@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
@@ -11,22 +12,16 @@ namespace KeySystemBot
     {
 		static VMApi API = new VMApi();
 		String Version = "0.1";
-		enum Server
-		{
-			valid_os,
-			Windows_2019_eval,
-			CentOS_7
-		}
+		
 
 		private List<long> TrustedUsers = new List<long>();
 
 		
 		private DiscordSocketClient _client;
-		DiscordConfig DiscordConfig_config;
-		DiscordSocketConfig DiscordSocketConfig_discordSocketConfig = new DiscordSocketConfig();
+
 		static void Main(string[] args)
         {
-			
+			Console.WriteLine(API.List());
 			new Program().MainAsync().GetAwaiter().GetResult();
 		}
 
@@ -36,9 +31,7 @@ namespace KeySystemBot
 			_client = new DiscordSocketClient();
 			_client.MessageReceived += CommandHandler;
 			_client.Log += Log;
-			DiscordConfig_config = new DiscordConfig();
-			DiscordConfig_config.UseInteractionSnowflakeDate= true;
-			DiscordSocketConfig_discordSocketConfig.LogGatewayIntentWarnings= true;
+			
 			var config = new DiscordSocketConfig
 			{
 				GatewayIntents = GatewayIntents.All
@@ -58,7 +51,13 @@ namespace KeySystemBot
 			Console.WriteLine(((LogMessage)(msg)).ToString((StringBuilder)null, true, true, DateTimeKind.Local, (int?)11));
 			return Task.CompletedTask;
 		}
-		
+		public readonly String[] Server = {
+				"Windows_2019_eval",
+				"CentOS_7",
+				"Ubuntu 22.10",
+				"valid_os",
+				"Debian 11.0"
+		};
 		private async Task<Task> CommandHandler(SocketMessage message)
 		{
 			//1 2 3
@@ -66,22 +65,140 @@ namespace KeySystemBot
 				Console.WriteLine("Message is Null");
 
 			Console.WriteLine("+++LINE: " + message.Content);
-			
+
 			if (message.Content.StartsWith("!Create"))
 			{
+				if (message.Content.Contains("help"))
+				{
+					EmbedBuilder val = new EmbedBuilder();
+					val.WithTitle("Server Creator Help");
+					val.AddField("**Components Options**:", "-----------");
+					val.AddField("Cores: ", "2 - 16");
+					val.AddField("Ram: ", "265 - 65000");
+					val.AddField("Disk: ", "10 - 300 (onlyin 10s Steps)");
+					val.WithDescription("Server Options: ");
+					val.AddField("**Server Options**:", "-----------");
+					val.AddField("Windows Server:", "1");
+					val.AddField("Centos 7 Server:", "2");
+					val.AddField("Ubuntu Server:", "3");
+					val.AddField("valid os Server:", "4");
+					val.AddField("Debian Server:", "5");
+					val.WithDescription("***Use !Create [Cores] [Ram] [Disk] [Server]***");
+					val.WithColor(Color.Blue);
+					await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+				}
 				String[] Args = message.Content.Split(' ');
-				EmbedBuilder val = new EmbedBuilder();
-				val.AddField("Test", 1, true);
-				val.WithTitle("Create Server");
-				val.WithDescription("Server created Sucessfully ID: " );
-				val.WithColor(Color.Red);
-				await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+				Console.WriteLine(String.Join(",", Args));
+				try
+				{
+					if (API.CreateServer(Server[Int32.Parse(Args[1])], Int32.Parse(Args[1]), Int32.Parse(Args[2]), Int32.Parse(Args[3])))
+					{
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[Int32.Parse(Args[1])]);
+						val.AddField("Cores:", Args[1]);
+						val.AddField("Ram: ", Args[2]);
+						val.AddField("Disk: ", Args[3]);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+					}
+					else
+					{
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created failed");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[Int32.Parse(Args[1])]);
+						val.AddField("Cores:", Args[1]);
+						val.AddField("Ram: ", Args[2]);
+						val.AddField("Disk: ", Args[3]);
+						val.WithColor(Color.Red);
+						await message.Channel.SendMessageAsync("", false, val.Build());
+					}
+				}
+				catch (Exception e)
+				{
+					EmbedBuilder val = new EmbedBuilder();
+					val.WithTitle("Server created failed");
+					val.WithDescription("Informations:");
+					val.AddField("Server", Server[Int32.Parse(Args[1])]);
+					val.AddField("Cores:", Args[1]);
+					val.AddField("Ram: ", Args[2]);
+					val.AddField("Disk: ", Args[3]);
+					val.WithColor(Color.Red);
+					await message.Channel.SendMessageAsync("", false, val.Build());
+				}
+
+
 				return Task.CompletedTask;
 			}
+			else if (message.Content.StartsWith("!delVM"))
+			{
+				String[] Args = message.Content.Split(' ');
+				try
+				{
+					if (API.DeleteServer(Server[Int32.Parse(Args[1])]))
+					{
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server Sucesfully Deleted!");
+						val.AddField("Vm ID:", Server[Int32.Parse(Args[1])]);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("", false, val.Build());
+					}
+					else
+					{
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server Failed to Delete Server!");
+						val.AddField("Vm ID:", Server[Int32.Parse(Args[1])]);
+						val.WithColor(Color.Red);
+						await message.Channel.SendMessageAsync("", false, val.Build());
+					}
+					
+				}
+				catch(Exception e)
+				{
+					EmbedBuilder val = new EmbedBuilder();
+					val.WithTitle("Server Failed to Delete Server!");
+					val.AddField("Vm ID:", Server[Int32.Parse(Args[1])]);
+					val.WithColor(Color.Red);
+					await message.Channel.SendMessageAsync("", false, val.Build());
+				}
+			}
+			else if (message.Content.StartsWith("!Server-List"))
+			{
+				
+				try
+				{
+					EmbedBuilder val = new EmbedBuilder();
+					val.WithTitle("Server Sucesfully Getting Server!");
+					val.AddField("Vm ID:",API.List());
+					val.WithColor(Color.Green);
+					await message.Channel.SendMessageAsync("", false, val.Build());
+				}
+				catch (Exception e)
+				{
+					EmbedBuilder val = new EmbedBuilder();
+					val.WithTitle("Server Failed to Getting Server List!");
+					val.AddField("Vm ID:", "Null");
+					val.WithColor(Color.Red);
+					await message.Channel.SendMessageAsync("", false, val.Build());
+				}
+			}
+			else if (message.Content.StartsWith("!delVM"))
+			{
+				String[] Args = message.Content.Split(' ');
+				try
+				{
 
-			
-			
-			if (message.Content == "help")
+				}
+				catch (Exception e)
+				{
+
+				}
+			}
+
+
+			if (message.Content == "fevregv")
 			{
 				EmbedBuilder val7 = new EmbedBuilder();
 				val7.WithTitle("Help");
