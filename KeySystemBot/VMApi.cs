@@ -31,6 +31,570 @@ namespace KeySystemBot
 
 
 		RestClient client;
+		public class SellixStuff
+		{
+			// Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
+			public class CustomField
+			{
+				public string type { get; set; }
+				public string name { get; set; }
+			}
+
+			public class Data
+			{
+				public Product product { get; set; }
+			}
+
+			public class Feedback
+			{
+				public int total { get; set; }
+				public int positive { get; set; }
+				public int neutral { get; set; }
+				public int negative { get; set; }
+				public List<object> numbers { get; set; }
+				public List<object> list { get; set; }
+			}
+
+			public class Log
+			{
+				[JsonProperty("1.start")]
+				public long _1start { get; set; }
+
+				[JsonProperty("2.shop")]
+				public int _2shop { get; set; }
+
+				[JsonProperty("3.errors")]
+				public int _3errors { get; set; }
+
+				[JsonProperty("4.infocard")]
+				public int _4infocard { get; set; }
+
+				[JsonProperty("6.averagescore")]
+				public int _6averagescore { get; set; }
+
+				[JsonProperty("7.sold_count")]
+				public int _7sold_count { get; set; }
+
+				[JsonProperty("8.regex")]
+				public int _8regex { get; set; }
+
+				[JsonProperty("9.view")]
+				public int _9view { get; set; }
+			}
+
+			public class PriceConversions
+			{
+				public int CAD { get; set; }
+				public int HKD { get; set; }
+				public int ISK { get; set; }
+				public int PHP { get; set; }
+				public int DKK { get; set; }
+				public int HUF { get; set; }
+				public int CZK { get; set; }
+				public int GBP { get; set; }
+				public int RON { get; set; }
+				public int SEK { get; set; }
+				public int IDR { get; set; }
+				public int INR { get; set; }
+				public int BRL { get; set; }
+				public int RUB { get; set; }
+				public int HRK { get; set; }
+				public int JPY { get; set; }
+				public int THB { get; set; }
+				public int CHF { get; set; }
+				public int EUR { get; set; }
+				public int MYR { get; set; }
+				public int BGN { get; set; }
+				public int TRY { get; set; }
+				public int CNY { get; set; }
+				public int NOK { get; set; }
+				public int NZD { get; set; }
+				public int ZAR { get; set; }
+				public int USD { get; set; }
+				public int MXN { get; set; }
+				public int SGD { get; set; }
+				public int AUD { get; set; }
+				public int ILS { get; set; }
+				public int KRW { get; set; }
+				public int PLN { get; set; }
+			}
+
+			public class Product
+			{
+				public int id { get; set; }
+				public string uniqid { get; set; }
+				public string slug { get; set; }
+				public int shop_id { get; set; }
+				public string type { get; set; }
+				public object subtype { get; set; }
+				public string title { get; set; }
+				public string currency { get; set; }
+				public int pay_what_you_want { get; set; }
+				public int price { get; set; }
+				public int price_display { get; set; }
+				public int price_discount { get; set; }
+				public int affiliate_revenue_percent { get; set; }
+				public object price_variants { get; set; }
+				public string description { get; set; }
+				public string image_attachment { get; set; }
+				public string file_attachment { get; set; }
+				public object youtube_link { get; set; }
+				public List<object> volume_discounts { get; set; }
+				public object recurring_interval { get; set; }
+				public object recurring_interval_count { get; set; }
+				public object trial_period { get; set; }
+				public object paypal_product_id { get; set; }
+				public object paypal_plan_id { get; set; }
+				public object stripe_price_id { get; set; }
+				public int discord_integration { get; set; }
+				public int discord_optional { get; set; }
+				public int discord_set_role { get; set; }
+				public object discord_server_id { get; set; }
+				public object discord_role_id { get; set; }
+				public int discord_remove_role { get; set; }
+				public int quantity_min { get; set; }
+				public int quantity_max { get; set; }
+				public int quantity_warning { get; set; }
+				public List<string> gateways { get; set; }
+				public List<CustomField> custom_fields { get; set; }
+				public int crypto_confirmations_needed { get; set; }
+				public int max_risk_level { get; set; }
+				public bool block_vpn_proxies { get; set; }
+				public string delivery_text { get; set; }
+				public int delivery_time { get; set; }
+				public string service_text { get; set; }
+				public string stock_delimiter { get; set; }
+				public int stock { get; set; }
+				public string dynamic_webhook { get; set; }
+				public int sort_priority { get; set; }
+				public bool unlisted { get; set; }
+				public int on_hold { get; set; }
+				public string terms_of_service { get; set; }
+				public int warranty { get; set; }
+				public string warranty_text { get; set; }
+				public int watermark_enabled { get; set; }
+				public string watermark_text { get; set; }
+				public object redirect_link { get; set; }
+				public bool @private { get; set; }
+				public int created_at { get; set; }
+				public int updated_at { get; set; }
+				public int updated_by { get; set; }
+				public int marketplace_category_id { get; set; }
+				public string name { get; set; }
+				public object image_name { get; set; }
+				public object image_storage { get; set; }
+				public object cloudflare_image_id { get; set; }
+				public Feedback feedback { get; set; }
+				public List<object> categories { get; set; }
+				public List<object> payment_gateways_fees { get; set; }
+				public List<object> serials { get; set; }
+				public List<object> webhooks { get; set; }
+				public PriceConversions price_conversions { get; set; }
+				public string theme { get; set; }
+				public int dark_mode { get; set; }
+				public string vat_percentage { get; set; }
+				public TaxDetails tax_details { get; set; }
+				public object average_score { get; set; }
+				public int sold_count { get; set; }
+				public List<object> addons { get; set; }
+			}
+
+			public class Root
+			{
+				public int status { get; set; }
+				public Data data { get; set; }
+				public object error { get; set; }
+				public object message { get; set; }
+				public string env { get; set; }
+				public Log log { get; set; }
+			}
+
+			public class TaxDetails
+			{
+				public string vat_percentage { get; set; }
+				public string tax_configuration { get; set; }
+				public List<object> tax_configuration_data { get; set; }
+				public int display_tax_on_storefront { get; set; }
+				public int display_tax_custom_fields { get; set; }
+				public int validation_only_for_companies { get; set; }
+				public int validate_vat_number { get; set; }
+				public int prices_tax_inclusive { get; set; }
+			}
+
+
+		}
+
+		public class AllOrders
+		{
+			public class Data
+			{
+				public Order order { get; set; }
+			}
+
+			public class Feedback
+			{
+				public int total { get; set; }
+				public int positive { get; set; }
+				public int neutral { get; set; }
+				public int negative { get; set; }
+				public List<object> numbers { get; set; }
+				public List<object> list { get; set; }
+			}
+
+			public class IpInfo
+			{
+				public bool success { get; set; }
+				public string message { get; set; }
+				public int fraud_score { get; set; }
+				public string country_code { get; set; }
+				public string region { get; set; }
+				public string city { get; set; }
+				public string ISP { get; set; }
+				public int ASN { get; set; }
+				public string operating_system { get; set; }
+				public string browser { get; set; }
+				public string organization { get; set; }
+				public bool is_crawler { get; set; }
+				public string timezone { get; set; }
+				public bool mobile { get; set; }
+				public string host { get; set; }
+				public bool proxy { get; set; }
+				public bool vpn { get; set; }
+				public bool tor { get; set; }
+				public bool active_vpn { get; set; }
+				public bool active_tor { get; set; }
+				public string device_brand { get; set; }
+				public string device_model { get; set; }
+				public bool recent_abuse { get; set; }
+				public bool bot_status { get; set; }
+				public string connection_type { get; set; }
+				public string abuse_velocity { get; set; }
+				public string zip_code { get; set; }
+				public double latitude { get; set; }
+				public double longitude { get; set; }
+				public string request_id { get; set; }
+				public object transaction_details { get; set; }
+				public int asn { get; set; }
+				public string isp { get; set; }
+			}
+
+			public class Log
+			{
+				[JsonProperty("1.start")]
+				public long _1start { get; set; }
+
+				[JsonProperty("2.shop")]
+				public int _2shop { get; set; }
+
+				[JsonProperty("3.errors")]
+				public int _3errors { get; set; }
+
+				[JsonProperty("4.infocard")]
+				public int _4infocard { get; set; }
+
+				[JsonProperty("6.averagescore")]
+				public int _6averagescore { get; set; }
+
+				[JsonProperty("7.sold_count")]
+				public int _7sold_count { get; set; }
+
+				[JsonProperty("8.regex")]
+				public int _8regex { get; set; }
+
+				[JsonProperty("9.view")]
+				public int _9view { get; set; }
+			}
+
+			public class Order
+			{
+				public int id { get; set; }
+				public string uniqid { get; set; }
+				public object recurring_billing_id { get; set; }
+				public string type { get; set; }
+				public object subtype { get; set; }
+				public int total { get; set; }
+				public int total_display { get; set; }
+				public object product_variants { get; set; }
+				public double exchange_rate { get; set; }
+				public int crypto_exchange_rate { get; set; }
+				public string currency { get; set; }
+				public int shop_id { get; set; }
+				public string shop_image_name { get; set; }
+				public string shop_image_storage { get; set; }
+				public string cloudflare_image_id { get; set; }
+				public string name { get; set; }
+				public string customer_email { get; set; }
+				public object affiliate_revenue_customer_id { get; set; }
+				public bool paypal_email_delivery { get; set; }
+				public string product_id { get; set; }
+				public string product_title { get; set; }
+				public string product_type { get; set; }
+				public object subscription_id { get; set; }
+				public object subscription_time { get; set; }
+				public string gateway { get; set; }
+				public object blockchain { get; set; }
+				public object paypal_apm { get; set; }
+				public object stripe_apm { get; set; }
+				public object paypal_email { get; set; }
+				public object paypal_order_id { get; set; }
+				public object paypal_payer_email { get; set; }
+				public int paypal_fee { get; set; }
+				public object paypal_subscription_id { get; set; }
+				public object paypal_subscription_link { get; set; }
+				public object lex_order_id { get; set; }
+				public object lex_payment_method { get; set; }
+				public object paydash_paymentID { get; set; }
+				public object virtual_payments_id { get; set; }
+				public object stripe_client_secret { get; set; }
+				public object stripe_price_id { get; set; }
+				public object skrill_email { get; set; }
+				public object skrill_sid { get; set; }
+				public object skrill_link { get; set; }
+				public object perfectmoney_id { get; set; }
+				public object binance_invoice_id { get; set; }
+				public object binance_qrcode { get; set; }
+				public object binance_checkout_url { get; set; }
+				public object crypto_address { get; set; }
+				public int crypto_amount { get; set; }
+				public int crypto_received { get; set; }
+				public object crypto_uri { get; set; }
+				public int crypto_confirmations_needed { get; set; }
+				public bool crypto_scheduled_payout { get; set; }
+				public int crypto_payout { get; set; }
+				public bool fee_billed { get; set; }
+				public object bill_info { get; set; }
+				public object cashapp_qrcode { get; set; }
+				public object cashapp_note { get; set; }
+				public object cashapp_cashtag { get; set; }
+				public string country { get; set; }
+				public string location { get; set; }
+				public string ip { get; set; }
+				public bool is_vpn_or_proxy { get; set; }
+				public string user_agent { get; set; }
+				public int quantity { get; set; }
+				public object coupon_id { get; set; }
+				public object custom_fields { get; set; }
+				public bool developer_invoice { get; set; }
+				public object developer_title { get; set; }
+				public object developer_webhook { get; set; }
+				public object developer_return_url { get; set; }
+				public string status { get; set; }
+				public object status_details { get; set; }
+				public object void_details { get; set; }
+				public int discount { get; set; }
+				public int fee_percentage { get; set; }
+				public object fee_breakdown { get; set; }
+				public int day_value { get; set; }
+				public string day { get; set; }
+				public string month { get; set; }
+				public int year { get; set; }
+				public object product_addons { get; set; }
+				public int created_at { get; set; }
+				public int updated_at { get; set; }
+				public int updated_by { get; set; }
+				public IpInfo ip_info { get; set; }
+				public string service_text { get; set; }
+				public List<object> webhooks { get; set; }
+				public object paypal_dispute { get; set; }
+				public List<object> product_downloads { get; set; }
+				public List<StatusHistory> status_history { get; set; }
+				public List<object> crypto_transactions { get; set; }
+				public List<object> products { get; set; }
+				public List<string> gateways_available { get; set; }
+				public bool shop_paypal_credit_card { get; set; }
+				public bool shop_force_paypal_email_delivery { get; set; }
+				public Product product { get; set; }
+			}
+
+			public class PriceConversions
+			{
+				public int CAD { get; set; }
+				public int HKD { get; set; }
+				public int ISK { get; set; }
+				public int PHP { get; set; }
+				public int DKK { get; set; }
+				public int HUF { get; set; }
+				public int CZK { get; set; }
+				public int GBP { get; set; }
+				public int RON { get; set; }
+				public int SEK { get; set; }
+				public int IDR { get; set; }
+				public int INR { get; set; }
+				public int BRL { get; set; }
+				public int RUB { get; set; }
+				public int HRK { get; set; }
+				public int JPY { get; set; }
+				public int THB { get; set; }
+				public int CHF { get; set; }
+				public int EUR { get; set; }
+				public int MYR { get; set; }
+				public int BGN { get; set; }
+				public int TRY { get; set; }
+				public int CNY { get; set; }
+				public int NOK { get; set; }
+				public int NZD { get; set; }
+				public int ZAR { get; set; }
+				public int USD { get; set; }
+				public int MXN { get; set; }
+				public int SGD { get; set; }
+				public int AUD { get; set; }
+				public int ILS { get; set; }
+				public int KRW { get; set; }
+				public int PLN { get; set; }
+			}
+
+			public class Product
+			{
+				public int id { get; set; }
+				public string uniqid { get; set; }
+				public string slug { get; set; }
+				public int shop_id { get; set; }
+				public string type { get; set; }
+				public object subtype { get; set; }
+				public string title { get; set; }
+				public string currency { get; set; }
+				public int pay_what_you_want { get; set; }
+				public int price { get; set; }
+				public int price_display { get; set; }
+				public int price_discount { get; set; }
+				public int affiliate_revenue_percent { get; set; }
+				public object price_variants { get; set; }
+				public string description { get; set; }
+				public string image_attachment { get; set; }
+				public string file_attachment { get; set; }
+				public object youtube_link { get; set; }
+				public List<object> volume_discounts { get; set; }
+				public object recurring_interval { get; set; }
+				public object recurring_interval_count { get; set; }
+				public object trial_period { get; set; }
+				public object paypal_product_id { get; set; }
+				public object paypal_plan_id { get; set; }
+				public object stripe_price_id { get; set; }
+				public int discord_integration { get; set; }
+				public int discord_optional { get; set; }
+				public int discord_set_role { get; set; }
+				public object discord_server_id { get; set; }
+				public object discord_role_id { get; set; }
+				public int discord_remove_role { get; set; }
+				public int quantity_min { get; set; }
+				public int quantity_max { get; set; }
+				public int quantity_warning { get; set; }
+				public List<string> gateways { get; set; }
+				public object custom_fields { get; set; }
+				public int crypto_confirmations_needed { get; set; }
+				public int max_risk_level { get; set; }
+				public bool block_vpn_proxies { get; set; }
+				public string delivery_text { get; set; }
+				public int delivery_time { get; set; }
+				public string service_text { get; set; }
+				public string stock_delimiter { get; set; }
+				public int stock { get; set; }
+				public string dynamic_webhook { get; set; }
+				public int sort_priority { get; set; }
+				public bool unlisted { get; set; }
+				public int on_hold { get; set; }
+				public string terms_of_service { get; set; }
+				public int warranty { get; set; }
+				public string warranty_text { get; set; }
+				public int watermark_enabled { get; set; }
+				public string watermark_text { get; set; }
+				public object redirect_link { get; set; }
+				public bool @private { get; set; }
+				public int created_at { get; set; }
+				public int updated_at { get; set; }
+				public int updated_by { get; set; }
+				public int marketplace_category_id { get; set; }
+				public string name { get; set; }
+				public object image_name { get; set; }
+				public object image_storage { get; set; }
+				public object cloudflare_image_id { get; set; }
+				public Feedback feedback { get; set; }
+				public List<object> categories { get; set; }
+				public List<object> payment_gateways_fees { get; set; }
+				public List<object> serials { get; set; }
+				public List<object> webhooks { get; set; }
+				public PriceConversions price_conversions { get; set; }
+				public string theme { get; set; }
+				public int dark_mode { get; set; }
+				public string vat_percentage { get; set; }
+				public TaxDetails tax_details { get; set; }
+				public object average_score { get; set; }
+				public int sold_count { get; set; }
+				public List<object> addons { get; set; }
+			}
+
+			public class Root
+			{
+				public int status { get; set; }
+				public Data data { get; set; }
+				public object error { get; set; }
+				public object message { get; set; }
+				public string env { get; set; }
+				public Log log { get; set; }
+			}
+
+			public class StatusHistory
+			{
+				public int id { get; set; }
+				public string invoice_id { get; set; }
+				public string status { get; set; }
+				public string details { get; set; }
+				public int created_at { get; set; }
+			}
+
+			public class TaxDetails
+			{
+				public string vat_percentage { get; set; }
+				public string tax_configuration { get; set; }
+				public List<object> tax_configuration_data { get; set; }
+				public int display_tax_on_storefront { get; set; }
+				public int display_tax_custom_fields { get; set; }
+				public int validation_only_for_companies { get; set; }
+				public int validate_vat_number { get; set; }
+				public int prices_tax_inclusive { get; set; }
+			}
+		}
+		public String GetProdukt(String ID)
+		{
+
+
+			client = new RestClient("https://dev.sellix.io/v1/orders/" + ID);
+			var request = new RestRequest(Method.GET);
+			client.AddDefaultHeader("Authorization", "Bearer HGtMZdYGrkLBDRByh91WY5HqDj5X4tgnHVAYidRzDWhWq7XL48iaTFNNLj3xEr8h");
+			client.AddDefaultHeader("X-Sellix-Merchant", "GxHost");
+			//client.AddDefaultHeader("X-Sellix-Merchant", "MuYo");
+			IRestResponse response = client.Execute(request);
+
+			AllOrders.Root Orders = JsonConvert.DeserializeObject<AllOrders.Root>(response.Content);
+
+			
+			
+			return Orders.data.order.product_id; 
+		}
+		public String ReturnProdukt(String ID)
+		{
+
+
+			client = new RestClient("https://dev.sellix.io/v1/products/" + ID);
+			var request = new RestRequest(Method.GET);
+			client.AddDefaultHeader("Authorization", "Bearer HGtMZdYGrkLBDRByh91WY5HqDj5X4tgnHVAYidRzDWhWq7XL48iaTFNNLj3xEr8h");
+			client.AddDefaultHeader("X-Sellix-Merchant", "GxHost");
+			//client.AddDefaultHeader("X-Sellix-Merchant", "MuYo");
+			IRestResponse response = client.Execute(request);
+
+			Console.WriteLine("API: " + response.Content);
+			SellixStuff.Root product = JsonConvert.DeserializeObject<SellixStuff.Root>(response.Content);
+
+			foreach(var name in product.data.product.custom_fields)
+			{
+				return product.data.product.title + ":" + product.data.product.description + ":" + name.name + " " + name.type;
+				
+			}
+			return "";
+			
+		}
+
+
 		public String List()
 		{
 			List<String> Hostnames = new List<String>();
@@ -137,11 +701,11 @@ namespace KeySystemBot
 			public double price { get; set; }
 		}
 
-		public bool ConfigureServer(int Cores, int Ram, int Disk)
+		public bool ConfigureServer(int id,int Cores, int Ram, int Disk)
 		{
 
 
-			client = new RestClient("https://sandbox.reselling.24fire.de/vm/price");
+			client = new RestClient("https://sandbox.reselling.24fire.de/vm/2" + id + "/change");
 			var request = new RestRequest(Method.PUT);
 			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
 			client.AddDefaultParameter("cores", Cores);
@@ -155,7 +719,21 @@ namespace KeySystemBot
 			else
 				return false;
 		}
-		public bool ResetPasword(String VMID)
+		public class ServerPassword
+		{
+			public class Data
+			{
+				public string password { get; set; }
+			}
+
+			public class Root
+			{
+				public string status { get; set; }
+				public Data data { get; set; }
+			}
+
+		}
+		public String ResetPasword(String VMID)
 		{
 
 
@@ -165,11 +743,14 @@ namespace KeySystemBot
 			//client.AddDefaultHeader("cores", "2");
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
+			ServerPassword.Root myDeserializedClass = JsonConvert.DeserializeObject<ServerPassword.Root>(response.Content);	
 
 			if (response.Content.Contains("success"))
-				return true;
+		       return myDeserializedClass.data.password;
 			else
-				return false;
+			{
+				return "Failed";
+			}
 		}
 		public bool CreateServer(String Server, int Cores, int Ram, int Disk)
 		{
@@ -246,6 +827,25 @@ namespace KeySystemBot
 				return false;
 		}
 
+		public class ServerStatus
+		{
+			public class Data
+			{
+				public string status { get; set; }
+				public double cpuUsage { get; set; }
+				public int usedMem { get; set; }
+				public int maxMem { get; set; }
+				public int uptime { get; set; }
+			}
+
+			public class Root
+			{
+				public string status { get; set; }
+				public Data data { get; set; }
+			}
+
+
+		}
 		public String Status(String VMID)
 		{
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/status");
@@ -253,15 +853,11 @@ namespace KeySystemBot
 			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
-			return response.Content;
+			ServerStatus.Root myDeserializedClass = JsonConvert.DeserializeObject<ServerStatus.Root>(response.Content);
+			return myDeserializedClass.data.status + ":" + myDeserializedClass.data.cpuUsage + ":"+ myDeserializedClass.data.usedMem + ":" + myDeserializedClass.data.uptime;
 		}
-		public enum ServerStatus
-		{
-			start,
-			stop,
-			restart
-		}
-		public bool SetStatus(String VMID, Enum Status)
+		
+		public bool SetStatus(String VMID, String Status)
 		{
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/status/" + Status);
@@ -342,6 +938,39 @@ namespace KeySystemBot
 			Console.WriteLine(response.Content);
 			return response.Content;
 		}
+		public class ServerConfigData
+		{
+			public class Data
+			{
+				public int cores { get; set; }
+				public int mem { get; set; }
+				public int disk { get; set; }
+				public string rdns { get; set; }
+				public string os { get; set; }
+				public string ipv4 { get; set; }
+				public string root_login { get; set; }
+				public string hostname { get; set; }
+				public string login_username { get; set; }
+				public DateTime createDate { get; set; }
+				public string status { get; set; }
+				public Price price { get; set; }
+			}
+
+			public class Price
+			{
+				public double pricePerMonth { get; set; }
+				public double pricePerDay { get; set; }
+				public double pricePerHour { get; set; }
+			}
+
+			public class Root
+			{
+				public string status { get; set; }
+				public Data data { get; set; }
+			}
+
+
+		}
 		public String Config(String VMID)
 		{
 
@@ -350,7 +979,8 @@ namespace KeySystemBot
 			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
-			return response.Content;
+			ServerConfigData.Root Config = JsonConvert.DeserializeObject<ServerConfigData.Root>(response.Content);
+			return Config.data.hostname + ":" + Config.data.ipv4 + ":" + Config.data.login_username + ":" + Config.data.root_login + ":" + Config.data.cores + ":" + Config.data.disk + ":" + Config.data.mem + ":" + Config.data.os + ":" + Config.data.createDate + ":" + Config.data.price.pricePerHour + ":" + Config.data.price.pricePerDay + ":" + Config.data.price.pricePerMonth;
 
 
 		}
