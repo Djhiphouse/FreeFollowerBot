@@ -1,35 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 using static KeySystemBot.VMApi;
 
 namespace KeySystemBot
 {
-    internal class Program
-    {
+	internal class Program
+	{
 		static VMApi API = new VMApi();
 		String Version = "0.1";
-		
+		public List<ulong> UserPerms = new List<ulong>();
 
 		private List<long> TrustedUsers = new List<long>();
 
-		
+
 		private DiscordSocketClient _client;
 		public static readonly String[] Server = {
-				"Windows_2019_eval",
+				"Windows 2019 eval",
 				"CentOS_7",
 				"Ubuntu 22.10",
 				"valid_os",
 				"Debian 11.0"
 		};
 		static void Main(string[] args)
-        {
-
+		{
+			SellixKeySystem sellixKey = new SellixKeySystem();
+			sellixKey.LoadKeys();
 			//Console.WriteLine("API: " + API.ReturnProdukt("7008d9-e59b60b5cb-1b1d82"));
 			//Console.WriteLine("Reinstall: " + API.ReinstallServer("20037", Server[2]));
 			new Program().MainAsync().GetAwaiter().GetResult();
@@ -42,17 +42,17 @@ namespace KeySystemBot
 			_client = new DiscordSocketClient();
 			_client.MessageReceived += CommandHandler;
 			_client.Log += Log;
-			
+
 			var config = new DiscordSocketConfig
 			{
 				GatewayIntents = GatewayIntents.All
 			};
-			 var client = new DiscordSocketClient(config);
+			var client = new DiscordSocketClient(config);
 			client.MessageReceived += CommandHandler;
 			client.Log += Log;
 			await client.LoginAsync(TokenType.Bot, token);
 			await client.StartAsync();
-			
+
 
 			await Task.Delay(-1);
 		}
@@ -62,7 +62,7 @@ namespace KeySystemBot
 			Console.WriteLine(((LogMessage)(msg)).ToString((StringBuilder)null, true, true, DateTimeKind.Local, (int?)11));
 			return Task.CompletedTask;
 		}
-		
+
 		private async Task<Task> CommandHandler(SocketMessage message)
 		{
 			//1 2 3
@@ -70,19 +70,379 @@ namespace KeySystemBot
 				Console.WriteLine("Message is Null");
 
 			Console.WriteLine("+++LINE: " + message.Content);
-			if (message.Content.StartsWith("!pay"))
+
+			if (message.Content.StartsWith("!delete") && message.Author.Id == 1067545233811849227)
 			{
 				String[] Args = message.Content.Split(' ');
-				String Product = API.ReturnProdukt(API.GetProdukt(Args[1]));
-				EmbedBuilder val = new EmbedBuilder();
-				val.WithTitle("Server Manager");
-				val.AddField("Invoice ID:", Args[1]);
-				val.AddField("Procut Name:", Product.Split(":")[0]);
-				val.AddField("Product Discription:", Product.Split(":")[1]);
-				val.AddField("Product Type:", Product.Split(":")[2]);
-				val.AddField("redeemed By: ", message.Author);
-				val.WithColor(Color.Green);
-				await message.Channel.SendMessageAsync("", false, val.Build());
+				try
+				{
+					Console.WriteLine("Args" + Args[0]);
+
+					UserPerms.Add(ulong.Parse(Args[0]));
+					EmbedBuilder val = new EmbedBuilder();
+					val.WithTitle("GxHost Permission");
+					val.AddField("Added Permission to UserID::", Args[0]);
+					val.AddField("Deleted By: ", message.Author);
+					val.WithColor(Color.Green);
+					await message.Channel.SendMessageAsync("", false, val.Build());
+
+
+				}
+				catch (Exception e)
+				{
+					EmbedBuilder val = new EmbedBuilder();
+					val.WithTitle("GxHost Permission Failed!");
+					val.WithDescription("**USE:** !addperms [UserID]");
+					val.WithColor(Color.Red);
+					await message.Channel.SendMessageAsync("", false, val.Build());
+				}
+			}
+			if (message.Content.StartsWith("!pay"))
+			{
+				SellixKeySystem KeySystem = new SellixKeySystem();
+				if (KeySystem.KeyisUsed(message.Content.Replace("!pay ", "")))
+				{
+					EmbedBuilder val = new EmbedBuilder();
+					val.WithTitle("KeySystem");
+					val.AddField("Key Already Used: ", message.Content.Replace("!pay ", ""));
+					val.AddField("redeemed By: ", message.Author);
+					val.WithColor(Color.Red);
+					await message.Channel.SendMessageAsync("", false, val.Build());
+					return Task.CompletedTask;
+				}
+				else
+				{
+					KeySystem.KeyUsed(message.Content.Replace("!pay ", ""));
+					EmbedBuilder val = new EmbedBuilder();
+					val.WithTitle("KeySystem");
+					val.AddField("Key Use: ", message.Content.Replace("!pay ", ""));
+					val.AddField("redeemed By: ", message.Author);
+					val.WithColor(Color.Green);
+					await message.Channel.SendMessageAsync("", false, val.Build());
+					Console.WriteLine("All Keys: " + String.Join(",", KeySystem.keys));
+					return Task.CompletedTask;
+				}
+				String[] Args = message.Content.Split(' ');
+				String ID = API.GetProdukt(message.Content.Replace("!pay ", ""));
+				String Product = API.ReturnProdukt(ID);
+				//Console.WriteLine("Product: " + Product.Length + " Test: " + String.Join(",", Product));
+				Console.WriteLine("Product: " + Product.Length + " Test: " + Product);
+
+
+				try
+				{
+
+					EmbedBuilder val = new EmbedBuilder();
+					val.WithTitle("Server Manager");
+					val.AddField("Invoice ID:", Args[1]);
+					val.AddField("redeemed By: ", message.Author);
+					val.WithColor(Color.Green);
+					await message.Channel.SendMessageAsync("", false, val.Build());
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e.ToString());
+					Console.WriteLine("Products: " + string.Join(" - ", Product));
+				}
+
+
+
+
+				//4
+				if (Product == "63d6f67269074")
+				{
+					if (Product == "63d868029e55b")
+					{
+						String[] Server = API.CreateServer("Debian 11.0", 4, 12000, 80).Split(":");
+
+
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+
+
+						return Task.CompletedTask;
+					}
+					else
+					{
+						String[] Server = API.CreateServer("Windows 2019 eval", 4, 12000, 80).Split(":");
+
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+
+
+					}
+					//5
+				}
+				else if (Product == "63d6f68eb7561")
+				{
+					if (Product == "63d8688ad89f2")
+					{
+						String[] Server = API.CreateServer("Debian 11.0", 4, 12000, 90).Split(":");
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+						return Task.CompletedTask;
+					}
+					else
+					{
+						String[] Server = API.CreateServer("Windows 2019 eval", 4, 12000, 90).Split(":");
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+					}
+				}
+				//6
+				else if (Product == "63d6f69a4fa70")
+				{
+					if (Product == "63d868e0dbf23")
+					{
+						String[] Server = API.CreateServer("Debian 11.0", 10, 16000, 70).Split(":");
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+						return Task.CompletedTask;
+					}
+					else
+					{
+						API.CreateServer("Windows 2019 eval", 10, 16000, 70).Split(":");
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+					}
+				}
+				//7
+				else if (Product == "63d6f6aac0d33")
+				{
+					if (Product == "63d8693836a7e")
+					{
+						String[] Server = API.CreateServer("Debian 11.0", 6, 24000, 100).Split(":");
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+						return Task.CompletedTask;
+					}
+					else
+					{
+						String[] Server = API.CreateServer("Windows 2019 eval", 6, 24000, 100).Split(":");
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+					}
+				}
+				//8
+				else if (Product == "63d6f6c2dd7d9")
+				{
+					if (Product == "63d869b529a62")
+					{
+						String[] Server = API.CreateServer("Debian 11.0", 8, 32000, 150).Split(":");
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+						return Task.CompletedTask;
+					}
+					else
+					{
+						API.CreateServer("Windows 2019 eval", 8, 32000, 150).Split(":");
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+					}
+				}
+				//9
+				else if (Product == "63d6f6db910cd")
+				{
+					if (Product == "63d86a00a9c14")
+					{
+						String[] Server = API.CreateServer("Debian 11.0", 11, 56000, 210).Split(":");
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+						return Task.CompletedTask;
+					}
+					else
+					{
+						API.CreateServer("Windows 2019 eval", 11, 56000, 210).Split(":");
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+					}
+				}
+				//10
+				else if (Product == "63d6f70567a65")
+				{
+					if (Product == "63d86a717243b")
+					{
+						String[] Server = API.CreateServer("Debian 11.0", 12, 64000, 200).Split(":");
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+						return Task.CompletedTask;
+					}
+					else
+					{
+						String[] Server = API.CreateServer("Windows 2019 eval", 12, 64000, 200).Split(":");
+						EmbedBuilder val = new EmbedBuilder();
+						val.WithTitle("Server created Sucessfully");
+						val.WithDescription("Informations:");
+						val.AddField("Server", Server[1]);
+						val.AddField("VmID", Server[0]);
+						val.AddField("Root Password:", Server[2]);
+						val.AddField("Ipv4:", Server[3]);
+						val.AddField("Cores:", Server[4]);
+						val.AddField("Ram: ", Server[5]);
+						val.AddField("Disk: ", Server[6]);
+						val.AddField("Status:", Server[7]);
+						val.AddField("Created By: ", message.Author);
+						val.WithColor(Color.Green);
+						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+					}
+				}
+
 			}
 
 			if (message.Content.StartsWith("!Create"))
@@ -110,32 +470,31 @@ namespace KeySystemBot
 				Console.WriteLine(String.Join(",", Args));
 				try
 				{
-					if (API.CreateServer(Server[Int32.Parse(Args[1])], Int32.Parse(Args[1]), Int32.Parse(Args[2]), Int32.Parse(Args[3])))
-					{
-						EmbedBuilder val = new EmbedBuilder();
-						val.WithTitle("Server created Sucessfully");
-						val.WithDescription("Informations:");
-						val.AddField("Server", Server[Int32.Parse(Args[1])]);
-						val.AddField("Cores:", Args[1]);
-						val.AddField("Ram: ", Args[2]);
-						val.AddField("Disk: ", Args[3]);
-						val.AddField("Created By: ", message.Author);
-						val.WithColor(Color.Green);
-						await message.Channel.SendMessageAsync("Content: ", false, val.Build());
-					}
-					else
-					{
-						EmbedBuilder val = new EmbedBuilder();
-						val.WithTitle("Server created failed");
-						val.WithDescription("Informations:");
-						val.AddField("Server", Server[Int32.Parse(Args[1])]);
-						val.AddField("Cores:", Args[1]);
-						val.AddField("Ram: ", Args[2]);
-						val.AddField("Disk: ", Args[3]);
-						val.AddField("Created By: ", message.Author);
-						val.WithColor(Color.Red);
-						await message.Channel.SendMessageAsync("", false, val.Build());
-					}
+					API.CreateServer(Server[Int32.Parse(Args[1])], Int32.Parse(Args[1]), Int32.Parse(Args[2]), Int32.Parse(Args[3]));
+
+					EmbedBuilder val = new EmbedBuilder();
+					val.WithTitle("Server created Sucessfully");
+					val.WithDescription("Informations:");
+					val.AddField("Server", Server[Int32.Parse(Args[1])]);
+					val.AddField("Cores:", Args[1]);
+					val.AddField("Ram: ", Args[2]);
+					val.AddField("Disk: ", Args[3]);
+					val.AddField("Created By: ", message.Author);
+					val.WithColor(Color.Green);
+					await message.Channel.SendMessageAsync("Content: ", false, val.Build());
+
+
+					EmbedBuilder vall = new EmbedBuilder();
+					val.WithTitle("Server created failed");
+					val.WithDescription("Informations:");
+					val.AddField("Server", Server[Int32.Parse(Args[1])]);
+					val.AddField("Cores:", Args[1]);
+					val.AddField("Ram: ", Args[2]);
+					val.AddField("Disk: ", Args[3]);
+					val.AddField("Created By: ", message.Author);
+					val.WithColor(Color.Red);
+					await message.Channel.SendMessageAsync("", false, val.Build());
+
 				}
 				catch (Exception e)
 				{
@@ -154,17 +513,17 @@ namespace KeySystemBot
 
 				return Task.CompletedTask;
 			}
-			else if (message.Content.StartsWith("!delete"))
+			else if (message.Content.StartsWith("!delete") && message.Author.Id == 1067545233811849227 || UserPerms.Contains(message.Author.Id))
 			{
 				String[] Args = message.Content.Split(' ');
 				try
 				{
 					Console.WriteLine("Args" + Args[0]);
-					if (API.DeleteServer(Server[Int32.Parse(String.Join("", Args).Replace("!delete",""))]))
+					if (API.DeleteServer(Server[Int32.Parse(String.Join("", Args).Replace("!delete", ""))]))
 					{
 						EmbedBuilder val = new EmbedBuilder();
 						val.WithTitle("Server Sucesfully Deleted!");
-						val.AddField("Vm ID:", String.Join("", Args).Replace("!delete",""));
+						val.AddField("Vm ID:", String.Join("", Args).Replace("!delete", ""));
 						val.AddField("Deleted By: ", message.Author);
 						val.WithColor(Color.Green);
 						await message.Channel.SendMessageAsync("", false, val.Build());
@@ -178,9 +537,9 @@ namespace KeySystemBot
 						val.WithColor(Color.Red);
 						await message.Channel.SendMessageAsync("", false, val.Build());
 					}
-					
+
 				}
-				catch(Exception e)
+				catch (Exception e)
 				{
 					EmbedBuilder val = new EmbedBuilder();
 					val.WithTitle("Server Failed to Delete Server!");
@@ -189,7 +548,7 @@ namespace KeySystemBot
 					await message.Channel.SendMessageAsync("", false, val.Build());
 				}
 			}
-			else if (message.Content.StartsWith("!Server-List"))
+			else if (message.Content.StartsWith("!Server-List") && message.Author.Id == 1067545233811849227 || UserPerms.Contains(message.Author.Id))
 			{
 				List<String> Hostnames = new List<String>();
 				List<String> RootPass = new List<String>();
@@ -217,7 +576,7 @@ namespace KeySystemBot
 				}
 				try
 				{
-					for(int i = 0; i< Hostnames.Count; i++)
+					for (int i = 0; i < Hostnames.Count; i++)
 					{
 						EmbedBuilder val = new EmbedBuilder();
 						val.WithTitle("Server Sucesfully Getting Server!");
@@ -232,7 +591,7 @@ namespace KeySystemBot
 						val.WithColor(Color.Green);
 						await message.Channel.SendMessageAsync("", false, val.Build());
 					}
-					
+
 				}
 				catch (Exception e)
 				{
@@ -249,33 +608,19 @@ namespace KeySystemBot
 					val.WithColor(Color.Red);
 					await message.Channel.SendMessageAsync("", false, val.Build());
 				}
-			}else if (message.Content.StartsWith("!getprice"))
+			}
+			else if (message.Content.StartsWith("!getprice"))
 			{
-				Roott myDeserializedClass = JsonConvert.DeserializeObject<Roott>(API.GetPrices());
 
-				try
-				{
-					EmbedBuilder val = new EmbedBuilder();
-					val.WithTitle("**Prices**");
-					val.AddField("1x Cores:", myDeserializedClass.data.cores.price + " €");
-					val.AddField("1GB Ram:",myDeserializedClass.data.mem.price + " €");
-					val.AddField("10GBs Storage:", myDeserializedClass.data.storage.price + " €");
-					val.AddField("1x IP:",myDeserializedClass.data.ipv4.price + " €");
-					val.WithColor(Color.Green);
-					await message.Channel.SendMessageAsync("", false, val.Build());
-				}
 
-				catch (Exception e)
-				{
-					EmbedBuilder val = new EmbedBuilder();
-					val.WithTitle("**Prices Failed**");
-					val.AddField("1x Cores:", "NULL" + " €");
-					val.AddField("1GB Ram:", "NULL" + " €");
-					val.AddField("10GBs Storage:", "NULL" + " €");
-					val.AddField("1x IP:", "NULL" + " €");
-					val.WithColor(Color.Red);
-					await message.Channel.SendMessageAsync("", false, val.Build());
-				}
+				EmbedBuilder val = new EmbedBuilder();
+				val.WithTitle("**Prices**");
+				val.AddField("1x Cores:", "0.90 €");
+				val.AddField("1GB Ram:", "0.70 €");
+				val.AddField("10GBs Storage:", "0.70 €");
+				val.WithColor(Color.Green);
+				await message.Channel.SendMessageAsync("", false, val.Build());
+
 
 			}
 			if (message.Content.StartsWith("!setrdns"))
@@ -327,12 +672,12 @@ namespace KeySystemBot
 				return Task.CompletedTask;
 
 			}
-			 if (message.Content.StartsWith("!status"))
+			if (message.Content.StartsWith("!status"))
 			{
 				String[] Args = message.Content.Split(' ');
 				try
 				{
-					
+
 					String Data = API.Status(Args[1]);
 					EmbedBuilder val = new EmbedBuilder();
 					val.WithTitle("**Server Status**");
@@ -343,19 +688,19 @@ namespace KeySystemBot
 					val.WithColor(Color.Green);
 					await message.Channel.SendMessageAsync("", false, val.Build());
 				}
-				catch(Exception e)
+				catch (Exception e)
 				{
 					EmbedBuilder val = new EmbedBuilder();
 					val.WithTitle("**Server Status Failed**");
-					val.AddField("VmID: " , Args[1]);
+					val.AddField("VmID: ", Args[1]);
 					val.WithColor(Color.Red);
 					await message.Channel.SendMessageAsync("", false, val.Build());
 				}
-				
-			
+
+
 			}
 
-			if (message.Content.StartsWith("!configureServer"))
+			if (message.Content.StartsWith("!configureServer") && message.Author.Id == 1067545233811849227 || UserPerms.Contains(message.Author.Id))
 			{
 				String[] Args = message.Content.Split(' ');
 				try
@@ -380,7 +725,7 @@ namespace KeySystemBot
 						val.WithColor(Color.Red);
 						await message.Channel.SendMessageAsync("", false, val.Build());
 					}
-					
+
 				}
 				catch (Exception e)
 				{
@@ -411,33 +756,8 @@ namespace KeySystemBot
 				catch (Exception e)
 				{
 					EmbedBuilder val = new EmbedBuilder();
-					val.WithTitle("**Server Status Failed**");
-					val.AddField("VmID: ", Password);
-					val.WithColor(Color.Red);
-					await message.Channel.SendMessageAsync("", false, val.Build());
-				}
-
-
-			}
-			if (message.Content.StartsWith("!subscrption"))
-			{
-				String[] Args = message.Content.Split(' ');
-				String Sub = API.GetSubscrption();
-				try
-				{
-
-					String Data = API.Status(Args[1]);
-					EmbedBuilder val = new EmbedBuilder();
 					val.WithTitle("**Server Password Change**");
-					//val.AddField("New Password:", Password);
-					val.WithColor(Color.Green);
-					await message.Channel.SendMessageAsync("", false, val.Build());
-				}
-				catch (Exception e)
-				{
-					EmbedBuilder val = new EmbedBuilder();
-					val.WithTitle("**Server Status Failed**");
-					//val.AddField("VmID: ", Password);
+					val.AddField("Password: ", Password);
 					val.WithColor(Color.Red);
 					await message.Channel.SendMessageAsync("", false, val.Build());
 				}
@@ -453,7 +773,7 @@ namespace KeySystemBot
 				try
 				{
 
-					
+
 					EmbedBuilder val = new EmbedBuilder();
 					val.WithTitle("**Server Cofig**");
 					val.AddField("Hostname:", Data.Split(":")[0]);
@@ -501,18 +821,18 @@ namespace KeySystemBot
 				String[] Args = message.Content.Split(' ');
 				try
 				{
-					
+
 					switch (Args[2])
 					{
 						case "1":
-							CurrentStatus= "start";
+							CurrentStatus = "start";
 							break;
 
-                        case "2":
+						case "2":
 							CurrentStatus = "stop";
 							break;
 
-	      				case "3":
+						case "3":
 							CurrentStatus = "restart";
 							break;
 					}
@@ -554,7 +874,7 @@ namespace KeySystemBot
 				String[] Args = message.Content.Split(' ');
 				try
 				{
-					
+
 					if (API.ReinstallServer(Args[1], Server[Int32.Parse(Args[2])]))
 					{
 						EmbedBuilder val7 = new EmbedBuilder();
@@ -576,7 +896,7 @@ namespace KeySystemBot
 						await message.Channel.SendMessageAsync("", false, val7.Build(), (RequestOptions)null, (AllowedMentions)null, (MessageReference)null, (MessageComponent)null, (ISticker[])null, (Embed[])null, (MessageFlags)0);
 					}
 				}
-				catch(Exception e)
+				catch (Exception e)
 				{
 					EmbedBuilder val7 = new EmbedBuilder();
 					val7.WithTitle("Server Reinstaller Failed");
@@ -586,8 +906,8 @@ namespace KeySystemBot
 					val7.WithColor(Color.Red);
 					await message.Channel.SendMessageAsync("", false, val7.Build(), (RequestOptions)null, (AllowedMentions)null, (MessageReference)null, (MessageComponent)null, (ISticker[])null, (Embed[])null, (MessageFlags)0);
 				}
-				
-				
+
+
 			}
 			return Task.CompletedTask;
 		}

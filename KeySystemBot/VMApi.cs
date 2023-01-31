@@ -1,16 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json.Serialization;
-using Discord.Net.Rest;
-using Microsoft.VisualBasic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using RestSharp;
-
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace KeySystemBot
 {
+
+	public class SellixKeySystem
+	{
+		public List<string> keys = new List<string>();
+		StreamWriter streamWriter;
+
+
+		public void LoadKeys()
+		{
+			StreamReader streamReader = new StreamReader(Directory.GetCurrentDirectory() + "\\UsedKey.keys");
+
+
+			String line = "";
+			while (line != null)
+			{
+				line = streamReader.ReadLine();
+				keys.Add(line);
+			}
+
+
+			streamReader.Close();
+			Console.WriteLine("All Keys: " + String.Join(",", keys));
+
+		}
+		public void KeyUsed(String Key)
+		{
+			if (!File.Exists(Directory.GetCurrentDirectory() + "\\UsedKey.keys"))
+			{
+				File.Create(Directory.GetCurrentDirectory() + "\\UsedKey.keys");
+			}
+			else
+			{
+				Console.WriteLine("Write in Config");
+				streamWriter = new StreamWriter((Directory.GetCurrentDirectory() + "\\UsedKey.keys"));
+				streamWriter.AutoFlush = true;
+				streamWriter.WriteLine(Key);
+				streamWriter.Flush();
+				streamWriter.Close();
+				keys.Add(Key);
+
+			}
+
+		}
+		public bool KeyisUsed(String Key)
+		{
+			try
+			{
+
+				for (int i = 0; i <= keys.Count; i++)
+				{
+					if (keys[i].Contains(Key))
+						return true;
+
+				}
+
+
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + e.Message + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+				return false;
+			}
+			return false;
+
+		}
+	}
 	internal class VMApi
 	{
 
@@ -27,7 +88,8 @@ namespace KeySystemBot
 				"valid_os",
 				"Debian 11.0"
 		};
-
+		String SellixKey = "HGtMZdYGrkLBDRByh91WY5HqDj5X4tgnHVAYidRzDWhWq7XL48iaTFNNLj3xEr8h";
+		String HostResellKey = "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9";
 
 
 		RestClient client;
@@ -560,16 +622,16 @@ namespace KeySystemBot
 
 			client = new RestClient("https://dev.sellix.io/v1/orders/" + ID);
 			var request = new RestRequest(Method.GET);
-			client.AddDefaultHeader("Authorization", "Bearer HGtMZdYGrkLBDRByh91WY5HqDj5X4tgnHVAYidRzDWhWq7XL48iaTFNNLj3xEr8h");
+			client.AddDefaultHeader("Authorization", "Bearer " + SellixKey);
 			client.AddDefaultHeader("X-Sellix-Merchant", "GxHost");
 			//client.AddDefaultHeader("X-Sellix-Merchant", "MuYo");
 			IRestResponse response = client.Execute(request);
 
 			AllOrders.Root Orders = JsonConvert.DeserializeObject<AllOrders.Root>(response.Content);
 
-			
-			
-			return Orders.data.order.product_id; 
+
+
+			return Orders.data.order.product_id;
 		}
 		public String ReturnProdukt(String ID)
 		{
@@ -577,7 +639,7 @@ namespace KeySystemBot
 
 			client = new RestClient("https://dev.sellix.io/v1/products/" + ID);
 			var request = new RestRequest(Method.GET);
-			client.AddDefaultHeader("Authorization", "Bearer HGtMZdYGrkLBDRByh91WY5HqDj5X4tgnHVAYidRzDWhWq7XL48iaTFNNLj3xEr8h");
+			client.AddDefaultHeader("Authorization", "Bearer " + SellixKey);
 			client.AddDefaultHeader("X-Sellix-Merchant", "GxHost");
 			//client.AddDefaultHeader("X-Sellix-Merchant", "MuYo");
 			IRestResponse response = client.Execute(request);
@@ -585,13 +647,11 @@ namespace KeySystemBot
 			Console.WriteLine("API: " + response.Content);
 			SellixStuff.Root product = JsonConvert.DeserializeObject<SellixStuff.Root>(response.Content);
 
-			foreach(var name in product.data.product.custom_fields)
-			{
-				return product.data.product.title + ":" + product.data.product.description + ":" + name.name + " " + name.type;
-				
-			}
-			return "";
-			
+
+			return product.data.product.uniqid;
+
+
+
 		}
 
 
@@ -609,7 +669,7 @@ namespace KeySystemBot
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/list");
 			var request = new RestRequest(Method.GET);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			IRestResponse response = client.Execute(request);
 
 			//Console.WriteLine("Hostnames: " + String.Join(",", Hostnames));
@@ -622,7 +682,7 @@ namespace KeySystemBot
 			//Console.WriteLine("Disk: " + String.Join(",", Disk));
 			//Console.WriteLine("CreatedDate: " + String.Join(",", Date));
 			//Console.WriteLine("HostNames: "+ String.Join(",", Hostnames));
-			return response.Content; 
+			return response.Content;
 		}
 		public class ServerConfig
 		{
@@ -642,14 +702,14 @@ namespace KeySystemBot
 			public object externalID { get; set; }
 			public DateTime createDate { get; set; }
 			public ServerConfig config { get; set; }
-			
+
 		}
 
 		public class Root
 		{
 			public string status { get; set; }
 			public List<Datum> data { get; set; }
-	
+
 		}
 
 
@@ -657,7 +717,7 @@ namespace KeySystemBot
 		{
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/prices");
 			var request = new RestRequest(Method.GET);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
 			return response.Content;
@@ -701,13 +761,13 @@ namespace KeySystemBot
 			public double price { get; set; }
 		}
 
-		public bool ConfigureServer(int id,int Cores, int Ram, int Disk)
+		public bool ConfigureServer(int id, int Cores, int Ram, int Disk)
 		{
 
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/2" + id + "/change");
 			var request = new RestRequest(Method.PUT);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			client.AddDefaultParameter("cores", Cores);
 			client.AddDefaultParameter("mem", Ram);
 			client.AddDefaultParameter("disk", Disk);
@@ -739,45 +799,71 @@ namespace KeySystemBot
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/reset-root");
 			var request = new RestRequest(Method.PUT);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			//client.AddDefaultHeader("cores", "2");
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
-			ServerPassword.Root myDeserializedClass = JsonConvert.DeserializeObject<ServerPassword.Root>(response.Content);	
+			ServerPassword.Root myDeserializedClass = JsonConvert.DeserializeObject<ServerPassword.Root>(response.Content);
 
 			if (response.Content.Contains("success"))
-		       return myDeserializedClass.data.password;
+				return myDeserializedClass.data.password;
 			else
 			{
 				return "Failed";
 			}
 		}
-		public bool CreateServer(String Server, int Cores, int Ram, int Disk)
+		public String CreateServer(String Server, int Cores, int Ram, int Disk)
 		{
 
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/create");
 			var request = new RestRequest(Method.PUT);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
-			client.AddDefaultParameter("cores", "2");
-			client.AddDefaultParameter("mem", "3500");
-			client.AddDefaultParameter("disk", "20");
+			client.AddDefaultHeader("Authorization", HostResellKey);
+			client.AddDefaultParameter("cores", Cores);
+			client.AddDefaultParameter("mem", Ram);
+			client.AddDefaultParameter("disk", Disk);
 			client.AddDefaultParameter("os", Server);
 			//client.AddDefaultHeader("cores", "2");
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
+			CreateServerData.Root myDeserializedClass = JsonConvert.DeserializeObject<CreateServerData.Root>(response.Content);
 
 			if (response.Content.Contains("success"))
-				return true;
+			{
+				return myDeserializedClass.data.vmid + ":" + myDeserializedClass.data.os + ":" + myDeserializedClass.data.root_password + ":" + myDeserializedClass.data.ipv4 + ":" + myDeserializedClass.data.cores + ":" + myDeserializedClass.data.mem + ":" + myDeserializedClass.data.disk + ":" + myDeserializedClass.data.status;
+			}
 			else
-				return false;
-		}
+			{
+				return "FAILED" + ":" + "FAILED" + ":" + "FAILED" + ":" + "FAILED" + ":" + "FAILED" + ":" + "FAILED" + ":" + "FAILED" + ":" + "FAILED";
+			}
 
+		}
+		public class CreateServerData
+		{
+			public class Data
+			{
+				public int vmid { get; set; }
+				public string os { get; set; }
+				public string root_password { get; set; }
+				public string ipv4 { get; set; }
+				public int cores { get; set; }
+				public int mem { get; set; }
+				public int disk { get; set; }
+				public string status { get; set; }
+			}
+
+			public class Root
+			{
+				public string status { get; set; }
+				public Data data { get; set; }
+			}
+
+		}
 		public bool DeleteServer(String VMID)
 		{
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/delete");
 			var request = new RestRequest(Method.PUT);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			//client.AddDefaultHeader("cores", "2");
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
@@ -794,7 +880,7 @@ namespace KeySystemBot
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/reinstall");
 			var request = new RestRequest(Method.PUT);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			client.AddDefaultParameter("os", Server.ToString().Replace("_", " "));
 			//client.AddDefaultHeader("cores", "2");
 			IRestResponse response = client.Execute(request);
@@ -814,7 +900,7 @@ namespace KeySystemBot
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/rdns");
 			var request = new RestRequest(Method.POST);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			client.AddDefaultParameter("domain", Domain);
 			//client.AddDefaultHeader("cores", "2");
 			IRestResponse response = client.Execute(request);
@@ -850,19 +936,19 @@ namespace KeySystemBot
 		{
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/status");
 			var request = new RestRequest(Method.GET);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
 			ServerStatus.Root myDeserializedClass = JsonConvert.DeserializeObject<ServerStatus.Root>(response.Content);
-			return myDeserializedClass.data.status + ":" + myDeserializedClass.data.cpuUsage + ":"+ myDeserializedClass.data.usedMem + ":" + myDeserializedClass.data.uptime;
+			return myDeserializedClass.data.status + ":" + myDeserializedClass.data.cpuUsage + ":" + myDeserializedClass.data.usedMem + ":" + myDeserializedClass.data.uptime;
 		}
-		
+
 		public bool SetStatus(String VMID, String Status)
 		{
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/status/" + Status);
 			var request = new RestRequest(Method.PUT);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			//client.AddDefaultHeader("cores", "2");
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
@@ -877,7 +963,7 @@ namespace KeySystemBot
 		{
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/snapshot");
 			var request = new RestRequest(Method.GET);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
 			return response.Content;
@@ -889,7 +975,7 @@ namespace KeySystemBot
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/snapshot");
 			var request = new RestRequest(Method.PUT);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
 
@@ -904,7 +990,7 @@ namespace KeySystemBot
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/snapshot/" + identifier);
 			var request = new RestRequest(Method.DELETE);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
 
@@ -919,7 +1005,7 @@ namespace KeySystemBot
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/snapshot/" + identifier);
 			var request = new RestRequest(Method.POST);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
 
@@ -933,7 +1019,7 @@ namespace KeySystemBot
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/accounting/unpaid");
 			var request = new RestRequest(Method.GET);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
 			return response.Content;
@@ -976,7 +1062,7 @@ namespace KeySystemBot
 
 			client = new RestClient("https://sandbox.reselling.24fire.de/vm/" + VMID + "/config");
 			var request = new RestRequest(Method.GET);
-			client.AddDefaultHeader("Authorization", "1tWXW6lIy7LPKYLJM2HERp4805C3rGZ9");
+			client.AddDefaultHeader("Authorization", HostResellKey);
 			IRestResponse response = client.Execute(request);
 			Console.WriteLine(response.Content);
 			ServerConfigData.Root Config = JsonConvert.DeserializeObject<ServerConfigData.Root>(response.Content);
@@ -985,7 +1071,7 @@ namespace KeySystemBot
 
 		}
 	}
-	
+
 
 
 }
