@@ -9,68 +9,51 @@ namespace KeySystemBot
 
 	public class SellixKeySystem
 	{
+		//Name SellixKeySystem
+		//Password Sellix24087705
 		public List<string> keys = new List<string>();
 		StreamWriter streamWriter;
 
-
-		public void LoadKeys()
+		public bool CheckKey(String key)
 		{
-			StreamReader streamReader = new StreamReader(Directory.GetCurrentDirectory() + "\\UsedKey.keys");
-
-
-			String line = "";
-			while (line != null)
+			string[] users = File.ReadAllLines("users.txt");
+			foreach (string user in users)
 			{
-				line = streamReader.ReadLine();
-				keys.Add(line);
-			}
-
-
-			streamReader.Close();
-			Console.WriteLine("All Keys: " + String.Join(",", keys));
-
-		}
-		public void KeyUsed(String Key)
-		{
-			if (!File.Exists(Directory.GetCurrentDirectory() + "\\UsedKey.keys"))
-			{
-				File.Create(Directory.GetCurrentDirectory() + "\\UsedKey.keys");
-			}
-			else
-			{
-				Console.WriteLine("Write in Config");
-				streamWriter = new StreamWriter((Directory.GetCurrentDirectory() + "\\UsedKey.keys"));
-				streamWriter.AutoFlush = true;
-				streamWriter.WriteLine(Key);
-				streamWriter.Flush();
-				streamWriter.Close();
-				keys.Add(Key);
-
-			}
-
-		}
-		public bool KeyisUsed(String Key)
-		{
-			try
-			{
-
-				for (int i = 0; i <= keys.Count; i++)
+				string userData = user;
+				if (userData == key)
 				{
-					if (keys[i].Contains(Key))
-						return true;
-
+					Console.WriteLine("Erfolgreich angemeldet");
+					return true;
 				}
-
-
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + e.Message + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-				return false;
 			}
 			return false;
 
 		}
+
+		public bool SellixCheckKey(String Key)
+		{
+
+
+			string[] users = File.ReadAllLines("users.txt");
+			foreach (string user in users)
+			{
+				string userData = user;
+				if (userData == Key)
+				{
+					Console.WriteLine("Benutzername ist bereits vergeben");
+					return true;
+				}
+			}
+
+			using (StreamWriter writer = File.AppendText("users.txt"))
+			{
+				writer.WriteLine(Key);
+			}
+
+			Console.WriteLine("Erfolgreich registriert");
+			return false;
+		}
+
 	}
 	internal class VMApi
 	{
@@ -619,36 +602,50 @@ namespace KeySystemBot
 		public String GetProdukt(String ID)
 		{
 
+			try
+			{
+				client = new RestClient("https://dev.sellix.io/v1/orders/" + ID);
+				var request = new RestRequest(Method.GET);
+				client.AddDefaultHeader("Authorization", "Bearer " + SellixKey);
+				client.AddDefaultHeader("X-Sellix-Merchant", "GxHost");
+				//client.AddDefaultHeader("X-Sellix-Merchant", "MuYo");
+				IRestResponse response = client.Execute(request);
 
-			client = new RestClient("https://dev.sellix.io/v1/orders/" + ID);
-			var request = new RestRequest(Method.GET);
-			client.AddDefaultHeader("Authorization", "Bearer " + SellixKey);
-			client.AddDefaultHeader("X-Sellix-Merchant", "GxHost");
-			//client.AddDefaultHeader("X-Sellix-Merchant", "MuYo");
-			IRestResponse response = client.Execute(request);
-
-			AllOrders.Root Orders = JsonConvert.DeserializeObject<AllOrders.Root>(response.Content);
+				AllOrders.Root Orders = JsonConvert.DeserializeObject<AllOrders.Root>(response.Content);
 
 
 
-			return Orders.data.order.product_id;
+				return Orders.data.order.product_id;
+			}
+			catch (Exception e)
+			{
+				return "";
+			}
+
 		}
 		public String ReturnProdukt(String ID)
 		{
 
+			try
+			{
+				client = new RestClient("https://dev.sellix.io/v1/products/" + ID);
+				var request = new RestRequest(Method.GET);
+				client.AddDefaultHeader("Authorization", "Bearer " + SellixKey);
+				client.AddDefaultHeader("X-Sellix-Merchant", "GxHost");
+				//client.AddDefaultHeader("X-Sellix-Merchant", "MuYo");
+				IRestResponse response = client.Execute(request);
 
-			client = new RestClient("https://dev.sellix.io/v1/products/" + ID);
-			var request = new RestRequest(Method.GET);
-			client.AddDefaultHeader("Authorization", "Bearer " + SellixKey);
-			client.AddDefaultHeader("X-Sellix-Merchant", "GxHost");
-			//client.AddDefaultHeader("X-Sellix-Merchant", "MuYo");
-			IRestResponse response = client.Execute(request);
-
-			Console.WriteLine("API: " + response.Content);
-			SellixStuff.Root product = JsonConvert.DeserializeObject<SellixStuff.Root>(response.Content);
+				Console.WriteLine("API: " + response.Content);
+				SellixStuff.Root product = JsonConvert.DeserializeObject<SellixStuff.Root>(response.Content);
 
 
-			return product.data.product.uniqid;
+				return product.data.product.uniqid;
+			}
+			catch (Exception e)
+			{
+				return "";
+			}
+
 
 
 

@@ -1,0 +1,14 @@
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\bin\Release\net48\KeySystemBot.exe.config
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\bin\Release\net48\KeySystemBot.exe
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\bin\Release\net48\KeySystemBot.pdb
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\obj\Release\net48\KeySystemBot.csproj.AssemblyReference.cache
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\obj\Release\net48\KeySystemBot.csproj.SuggestedBindingRedirects.cache
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\obj\Release\net48\KeySystemBot.exe.config
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\obj\Release\net48\KeySystemBot.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\obj\Release\net48\KeySystemBot.AssemblyInfoInputs.cache
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\obj\Release\net48\KeySystemBot.AssemblyInfo.cs
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\obj\Release\net48\KeySystemBot.csproj.CoreCompileInputs.cache
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\obj\Release\net48\KeySystemBot.csproj.Fody.CopyLocal.cache
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\obj\Release\net48\KeySystemBot.csproj.Fody.RuntimeCopyLocal.cache
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\obj\Release\net48\KeySystemBot.exe
+C:\Users\fride\source\repos\FreeFollowerBot\KeySystemBot\obj\Release\net48\KeySystemBot.pdb
